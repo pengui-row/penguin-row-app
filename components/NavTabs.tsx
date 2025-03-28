@@ -1,4 +1,5 @@
 import React from 'react'
+import { router } from "expo-router";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 
@@ -42,15 +43,15 @@ const NavTabs = () => {
 
   return (
     <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity onPress={() => router.push("/Home")}style={styles.navItem}>
           <Ionicons name="home" size={24} color="#1DA1F2" />
           <Text style={styles.navTextActive}>Principal</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity onPress={() => router.push("/Search")} style={styles.navItem}>
           <Ionicons name="search-outline" size={24} color="#657786" />
           <Text style={styles.navText}>Buscar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItemCenter}>
+        <TouchableOpacity onPress={() => router.push("/CreatePost")} style={styles.navItemCenter}>
           <View style={styles.addButton}>
             <Ionicons name="add" size={24} color="white" />
           </View>

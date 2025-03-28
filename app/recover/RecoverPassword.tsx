@@ -4,17 +4,17 @@ import Card from '@/components/Card'
 import Title from '@/components/Title'
 import Input from '@/components/Input'
 import Button from '@/components/Button'
-import { validEmail } from '@/utils/validate'
 import Toast from '@/components/Toast'
 import { FontAwesome } from '@expo/vector-icons'
 import { router } from 'expo-router'
+import { Validation } from '@/utils/validate'
 
 const RecoverPassword = () => {
   const [email, setEmail] = useState("");
   const [toast, setToast] = useState(false);
-
+  const validate = new Validation();
   const sendRecoverPassword = () =>{
-    if (!validEmail(email)) {
+    if (!validate.validEmail(email)) {
       setToast(true);
     }
     else {

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "penguin-row-app",
-    "slug": "penguin-row-app",
+    "slug": "penguin-row",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.penguin.row"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +37,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "b7323b73-8d84-4998-b612-2c705cea45cc"
+      }
+    },
+    "owner": "chrisjgr"
   }
 }

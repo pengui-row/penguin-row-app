@@ -47,6 +47,9 @@ const Login: React.FC = () => {
     Alert.alert("Registrarse", "Ir a la pantalla de registro.");
   };
 
+  const recoverPassword = () => {
+    router.push('/recover/RecoverPassword');
+  }
   return (
     <Card>
       <Logo displayText={true} />
@@ -89,9 +92,7 @@ const Login: React.FC = () => {
         </View>
 
         <Button
-          onPress={() =>
-            Alert.alert("¿Olvidaste la contraseña?", "Recupérala ahora.")
-          }
+          onPress={recoverPassword}
           title="¿Olvidaste la contraseña?"
           style={styles.forgotPasswordButton}
           textStyle={styles.forgotPassword}

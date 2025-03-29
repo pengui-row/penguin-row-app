@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
-import { router } from 'expo-router';
+import { View, Text, Alert, StyleSheet } from "react-native";
+import { router } from "expo-router";
+
 import Checkbox from "@/components/Checkbox";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
@@ -15,13 +16,35 @@ const Login: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Función para validar formato de correo
+  const isValidEmail = (email: string) => {
+    const emailRegex =
+      /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/; // Regex para validar el email
+    return emailRegex.test(email);
+  };
+
   const signInWithEmail = () => {
-    alert('ingresar');
-    router.push('/Home'); //para cambiar de vista
+    if (!email || !password) {
+      Alert.alert("Datos incorrectos", "Por favor llena todos los campos.");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      Alert.alert("Correo inválido", "Por favor ingresa un correo válido.");
+      return;
+    }
+
+    // Proceder con la autenticación si los campos son válidos
+    setLoading(true);
+    Alert.alert("Inicio exitoso", "Redirigiendo...");
+    setTimeout(() => {
+      setLoading(false);
+      router.push("/Home"); //para cambiar de vista
+    }, 1000); // Simula un tiempo de carga
   };
 
   const signUpWithEmail = () => {
-    alert('registrarse');
+    Alert.alert("Registrarse", "Ir a la pantalla de registro.");
   };
 
   const recoverPassword = () => {
@@ -29,9 +52,9 @@ const Login: React.FC = () => {
   }
   return (
     <Card>
-      <Logo displayText={true}/>
+      <Logo displayText={true} />
 
-      <Title content="Iniciar Sesión"/>
+      <Title content="Iniciar Sesión" />
 
       <View style={styles.registerContainer}>
         <Text style={styles.registerText}>¿No tienes una cuenta? </Text>
@@ -61,7 +84,10 @@ const Login: React.FC = () => {
 
       <View style={styles.optionsRow}>
         <View style={styles.rememberContainer}>
-          <Checkbox checked={rememberMe} onPress={() => setRememberMe(!rememberMe)} />
+          <Checkbox
+            checked={rememberMe}
+            onPress={() => setRememberMe(!rememberMe)}
+          />
           <Text style={styles.rememberText}>Recordarme</Text>
         </View>
 

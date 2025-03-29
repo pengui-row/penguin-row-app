@@ -1,32 +1,36 @@
-import React from "react"
-import { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import { ChevronDown } from "lucide-react-native"
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TextInput } from "react-native";
 
 interface HashtagSelectorProps {
-  selectedHashtag: string
-  onSelect: (hashtag: string) => void
+  selectedHashtag: string;
+  onSelect: (hashtag: string) => void;
 }
 
 export const HashtagSelector: React.FC<HashtagSelectorProps> = ({ selectedHashtag, onSelect }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [hashtag, setHashtag] = useState(selectedHashtag);
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen)
-  }
+  const handleEndEditing = () => {
+    if (hashtag.trim()) {
+      onSelect(hashtag); // Al terminar la edición, actualiza el hashtag seleccionado
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Hashtags</Text>
-      <TouchableOpacity style={styles.selector} onPress={toggleDropdown} activeOpacity={0.7}>
-        <View style={styles.hashtag}>
-          <Text style={styles.hashtagText}>{selectedHashtag}</Text>
-        </View>
-        <ChevronDown size={20} color="#666" />
-      </TouchableOpacity>
+      <View style={styles.selector}>
+        <TextInput
+          style={styles.input}
+          value={hashtag}
+          onChangeText={setHashtag}
+          onEndEditing={handleEndEditing} // Maneja el evento de finalizar la edición
+          placeholder="Escribe tu hashtag..."
+          placeholderTextColor="#999"
+        />
+      </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -38,22 +42,16 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   selector: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     backgroundColor: "#F5F5F5",
     borderRadius: 8,
     padding: 12,
   },
-  hashtag: {
+  input: {
     backgroundColor: "#EFEFEF",
     borderRadius: 20,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-  },
-  hashtagText: {
-    color: "#666",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    color: "#333",
     fontSize: 14,
   },
-})
-
+});

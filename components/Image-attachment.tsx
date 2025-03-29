@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native"
-import { Plus } from "lucide-react-native"
+import { Feather } from '@expo/vector-icons';
 
 interface ImageAttachmentProps {
   images: string[]
@@ -18,7 +18,7 @@ export const ImageAttachment: React.FC<ImageAttachmentProps> = ({ images, onAddI
           </View>
         ))}
         <TouchableOpacity style={styles.addButton} onPress={onAddImage}>
-          <Plus size={24} color="#999" />
+          <Feather name="plus" size={20} color="#999" />
         </TouchableOpacity>
       </View>
     </View>

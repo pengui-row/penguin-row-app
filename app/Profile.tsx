@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome } from '@expo/vector-icons';
 import ProfileInfo from '@/components/ProfileInfo';
 import ProfileDescription from '@/components/ProfileDescription';
+import NavTabs from '@/components/NavTabs';
 const ComponenteUno = () => (
     <View style={[styles.component, { backgroundColor: 'lightblue' }]}>
       <Text>TODO LISTA DE POST</Text>
@@ -32,7 +33,7 @@ const Profile = () => {
         setSelectedIndex(newIndex);
     };
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex:1}}>
       <View style={styles.headerContainer}>
         <Text style={{fontWeight:"bold", marginRight:"28%"}}>Perfil</Text>
         <FontAwesome.Button 
@@ -77,7 +78,7 @@ const Profile = () => {
           </View>
         ))}
       </ScrollView>
-      
+      <NavTabs/>
     </SafeAreaView>
   )
 }

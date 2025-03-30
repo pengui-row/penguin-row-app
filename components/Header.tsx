@@ -7,6 +7,8 @@ interface HeaderProps {
   onBack: () => void
 }
 
+// TODO: Agregar icono flecha hacia arriba
+
 export const Header: React.FC<HeaderProps> = ({ title, onBack }) => {
   return (
     <View style={styles.header}>

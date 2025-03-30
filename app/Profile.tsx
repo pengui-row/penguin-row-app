@@ -6,23 +6,14 @@ import { FontAwesome } from '@expo/vector-icons';
 import ProfileInfo from '@/components/ProfileInfo';
 import ProfileDescription from '@/components/ProfileDescription';
 import NavTabs from '@/components/NavTabs';
-const ComponenteUno = () => (
-    <View style={[styles.component, { backgroundColor: 'lightblue' }]}>
-      <Text>TODO LISTA DE POST</Text>
-    </View>
-  );
-  
-  const ComponenteDos = () => (
-    <View style={[styles.component, { backgroundColor: 'lightcoral' }]}>
-      <Text>TODO LISTA DE FAVORITOS</Text>
-    </View>
-  );
+import UserPosts from '@/components/UserPosts';
+import FavoritePosts from '@/components/FavoritePosts';
   
 const Profile = () => {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const scrollViewRef = useRef<ScrollView>(null);
     const { width: screenWidth } = Dimensions.get('window');
-    const components = [ComponenteUno, ComponenteDos, ProfileDescription];
+    const components = [UserPosts, FavoritePosts, ProfileDescription];
     const handleIndexChange = (index: number) => {
         setSelectedIndex(index);
         scrollViewRef.current?.scrollTo({ x: index * screenWidth, y: 0, animated: true });

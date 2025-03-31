@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
@@ -13,10 +13,19 @@ interface PostProps {
     comments: string;
     likes: string;
     hasImage: boolean;
+    favorite?: boolean;
+    isLiked?: boolean;
   };
 }
 
 const PostCard = ({ post }: PostProps) => {
+  const [likes, setLikes] = useState(post.likes);
+  const [favorite, setFavorite] = useState<boolean>(
+    post.favorite ? true : false
+  );
+  const [isLiked, setIsLiked] = useState<boolean>(
+    post.isLiked ? true : false
+  );
   // Función para resaltar hashtags
   const renderTextWithHashtags = (text: string) => {
     const parts = text.split(/(#\w+)/g); // Dividir el texto en partes
@@ -36,7 +45,19 @@ const PostCard = ({ post }: PostProps) => {
       }
     });
   };
-
+  const handlePressLike = () => {
+    if (isLiked){
+      setLikes(`${parseInt(likes) - 1}`);
+      setIsLiked(false);
+    }
+    else {
+      setLikes(`${parseInt(likes) + 1}`);
+      setIsLiked(true);
+    }
+  };
+  const handlePressFavorite = () => {
+    setFavorite(!favorite)
+  }
   return (
     <View style={styles.postContainer}>
       <Image source={post.avatar} style={styles.avatar} />
@@ -63,9 +84,9 @@ const PostCard = ({ post }: PostProps) => {
         )}
 
         <View style={styles.postActions}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Feather name="heart" size={16} color="#657786" />
-            <Text style={styles.actionText}>{post.likes}</Text>
+          <TouchableOpacity style={styles.actionButton} onPress={handlePressLike}>
+            <Feather name="heart" size={16} color={isLiked ? "red" : "#657786"} />
+            <Text style={{...styles.actionText, color: isLiked ? "red" : "#657786"}}>{likes}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionButton}>
@@ -73,8 +94,8 @@ const PostCard = ({ post }: PostProps) => {
             <Text style={styles.actionText}>{post.comments}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
-            <Feather name="bookmark" size={16} color="#657786" />
+          <TouchableOpacity style={styles.actionButton} onPress={handlePressFavorite}>
+            <Feather name="bookmark" size={16} color={favorite ? "#FFA726" : "#657786"} />
           </TouchableOpacity>
         </View>
       </View>

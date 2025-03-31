@@ -60,7 +60,7 @@ const NavTabs = () => {
           <Ionicons name="notifications-outline" size={24} color="#657786" />
           <Text style={styles.navText}>Notificaciones</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity onPress={() => router.push("/Profile")} style={styles.navItem}>
           <Ionicons name="person-outline" size={24} color="#657786" />
           <Text style={styles.navText}>Perfil</Text>
         </TouchableOpacity>

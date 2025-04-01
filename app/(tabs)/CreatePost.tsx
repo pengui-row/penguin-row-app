@@ -2,11 +2,11 @@ import React from "react"
 import { useState } from "react"
 import { View, StyleSheet, TouchableOpacity, Text, ScrollView,StatusBar } from "react-native"
 import * as ImagePicker from "expo-image-picker"
-import { Header } from "../components/Header"
-import { TextInputField } from "../components/Text-input-field"
-import { HashtagSelector } from "../components/Hashtag-selector"
+import { Header } from "../../components/Header"
+import { TextInputField } from "../../components/Text-input-field"
+import { HashtagSelector } from "../../components/Hashtag-selector"
 
-import { ImageAttachment } from "../components/Image-attachment"
+import { ImageAttachment } from "../../components/Image-attachment"
 import { router } from "expo-router"
 const CreatePost: React.FC = () => {
   const [title, setTitle] = useState("")

@@ -69,7 +69,6 @@ const Profile = () => {
           </View>
         ))}
       </ScrollView>
-      <NavTabs/>
     </SafeAreaView>
   )
 }

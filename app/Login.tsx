@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Alert, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { router } from "expo-router";
 
 import Checkbox from "@/components/Checkbox";
@@ -8,6 +8,7 @@ import Input from "@/components/Input";
 import Title from "@/components/Title";
 import Card from "@/components/Card";
 import Logo from "@/components/Logo";
+import Toast from "@/components/Toast";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +16,16 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [toast, setToast] = useState(false);
+  const [toastConfig, setToastConfig] = useState<{
+    title: string;
+    message: string;
+    type: "success" | "failure";
+  }>({
+    title: '',
+    message: '',
+    type: 'success'
+  });
 
   // Función para validar formato de correo
   const isValidEmail = (email: string) => {
@@ -23,28 +34,34 @@ const Login: React.FC = () => {
     return emailRegex.test(email);
   };
 
+  const showToast = (title: string, message: string, type: 'success' | 'failure' = 'success') => {
+    setToastConfig({ title, message, type });
+    setToast(true);
+    setTimeout(() => setToast(false), 5000);
+  };
+
   const signInWithEmail = () => {
     if (!email || !password) {
-      Alert.alert("Datos incorrectos", "Por favor llena todos los campos.");
+      showToast("Datos incorrectos", "Por favor llena todos los campos.", 'failure');
       return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert("Correo inválido", "Por favor ingresa un correo válido.");
+      showToast("Correo inválido", "Por favor ingresa un correo válido.", 'failure');
       return;
     }
 
     // Proceder con la autenticación si los campos son válidos
     setLoading(true);
-    Alert.alert("Inicio exitoso", "Redirigiendo...");
+    showToast("Inicio exitoso", "Redirigiendo...", 'success');
     setTimeout(() => {
       setLoading(false);
-      router.push("/(tabs)"); //para cambiar de vista
-    }, 1000); // Simula un tiempo de carga
+      router.push("/(tabs)");
+    }, 1000);
   };
 
   const signUpWithEmail = () => {
-    Alert.alert("Registrarse", "Ir a la pantalla de registro.");
+    showToast("Registrarse", "Ir a la pantalla de registro.", 'success');
   };
 
   const recoverPassword = () => {
@@ -103,6 +120,14 @@ const Login: React.FC = () => {
         onPress={signInWithEmail}
         title={loading ? "Cargando..." : "Iniciar Sesión"}
         disabled={loading}
+      />
+      <Toast
+        visible={toast}
+        title={toastConfig.title}
+        message={toastConfig.message}
+        type={toastConfig.type}
+        onClose={() => setToast(false)}
+        autoCloseDelay={5000}
       />
     </Card>
   );

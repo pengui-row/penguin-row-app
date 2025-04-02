@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, SafeAreaView, StatusBar } from 'react-native';
 import SearchBar from '../../components/SearchBar';
 import RecentSearches from '../../components/RecentSearches';
-import NavTabs from '@/components/NavTabs';
 
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState('');

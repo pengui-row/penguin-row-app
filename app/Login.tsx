@@ -61,7 +61,7 @@ const Login: React.FC = () => {
   };
 
   const signUpWithEmail = () => {
-    showToast("Registrarse", "Ir a la pantalla de registro.", 'success');
+    router.push("/register/Register");
   };
 
   const recoverPassword = () => {

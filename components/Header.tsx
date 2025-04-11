@@ -26,13 +26,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
   },
   backButton: {
     marginRight: 16,
+    padding: 8,
   },
   title: {
     fontSize: 18,
     fontWeight: "600",
+    color: '#000',
   },
 })
 

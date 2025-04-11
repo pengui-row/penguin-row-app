@@ -22,7 +22,7 @@ const CreatePost: React.FC = () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
     if (permissionResult.granted === false) {
-      alert("Se requiere permiso para acceder a la galería")
+      console.log("Se requiere permiso para acceder a la galería")
       return
     }
 
@@ -45,7 +45,7 @@ const CreatePost: React.FC = () => {
       hashtag: selectedHashtag,
       images,
     })
-    alert('funcion de publicar')
+    console.log("funcion de publicar")
   }
 
   return (

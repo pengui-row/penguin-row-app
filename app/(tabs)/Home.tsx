@@ -1,7 +1,6 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet, View, Image, ScrollView } from "react-native"
 import PostCard from "@/components/PostCard";
-import NavTabs from "@/components/NavTabs";
 import Logo from "@/components/Logo";
 
 // Declaramos el tipo para las props (aunque no tiene props por ahora).

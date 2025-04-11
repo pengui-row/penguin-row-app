@@ -11,6 +11,7 @@ interface InputProps {
   inputStyle?: TextStyle;
   labelStyle?: TextStyle;
   keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
+  multiline?: boolean
 }
 
 const Input: React.FC<InputProps> = ({
@@ -23,6 +24,7 @@ const Input: React.FC<InputProps> = ({
   inputStyle,
   labelStyle,
   keyboardType = "default",
+  multiline
 }) => {
   return (
     <View style={[styles.container, style]}>
@@ -36,6 +38,7 @@ const Input: React.FC<InputProps> = ({
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize="none"
+        multiline={multiline}
       />
     </View>
   );

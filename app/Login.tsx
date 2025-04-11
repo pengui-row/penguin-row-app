@@ -39,7 +39,7 @@ const Login: React.FC = () => {
     Alert.alert("Inicio exitoso", "Redirigiendo...");
     setTimeout(() => {
       setLoading(false);
-      router.push("/Home"); //para cambiar de vista
+      router.push("/(tabs)"); //para cambiar de vista
     }, 1000); // Simula un tiempo de carga
   };
 

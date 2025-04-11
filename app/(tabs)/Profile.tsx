@@ -8,6 +8,7 @@ import ProfileDescription from '@/components/ProfileDescription';
 import NavTabs from '@/components/NavTabs';
 import UserPosts from '@/components/UserPosts';
 import FavoritePosts from '@/components/FavoritePosts';
+import { router } from 'expo-router';
   
 const Profile = () => {
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -32,7 +33,7 @@ const Profile = () => {
         style={styles.configStyle}
         color={"#1E3A5F"}
         backgroundColor={"transparent"}
-        onPress={()=>{console.log("hola")}}
+        onPress={()=>{router.push("/(tabs)/profileConfig/EditProfile")}}
         />
       </View>
       <ProfileInfo/>
@@ -69,7 +70,6 @@ const Profile = () => {
           </View>
         ))}
       </ScrollView>
-      <NavTabs/>
     </SafeAreaView>
   )
 }

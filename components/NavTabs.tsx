@@ -1,9 +1,11 @@
 import React from 'react'
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
-
-const NavTabs = () => {
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+interface NavTabsProps extends BottomTabBarProps {
+}
+const NavTabs: React.FC<NavTabsProps>  = ({navigation, state}) => {
 
     const styles = StyleSheet.create({
         addButton: {
@@ -40,29 +42,33 @@ const NavTabs = () => {
             justifyContent: "center",
           },
     });
-
+    const segments = useSegments();
+    const isActiveRoute = (routeName: string): boolean => {
+      const currentRoute = segments.join('/');
+      return currentRoute.startsWith(routeName.toLowerCase());
+    };
   return (
     <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => router.push("/Home")}style={styles.navItem}>
-          <Ionicons name="home" size={24} color="#1DA1F2" />
-          <Text style={styles.navTextActive}>Principal</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Home")}style={styles.navItem}>
+          <Ionicons name="home" size={24} color={isActiveRoute("Home") ? "#1DA1F2" : "#657786"} />
+          <Text style={isActiveRoute("Home") ? styles.navTextActive : styles.navText}>Principal</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/Search")} style={styles.navItem}>
-          <Ionicons name="search-outline" size={24} color="#657786" />
-          <Text style={styles.navText}>Buscar</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Search")} style={styles.navItem}>
+          <Ionicons name="search-outline" size={24} color={isActiveRoute("Home") ? "#1DA1F2" : "#657786"} />
+          <Text style={isActiveRoute("Home") ? styles.navTextActive : styles.navText}>Buscar</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/CreatePost")} style={styles.navItemCenter}>
+        <TouchableOpacity onPress={() => navigation.navigate("CreatePost")} style={styles.navItemCenter}>
           <View style={styles.addButton}>
             <Ionicons name="add" size={24} color="white" />
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="notifications-outline" size={24} color="#657786" />
-          <Text style={styles.navText}>Notificaciones</Text>
+          <Ionicons name="notifications-outline" size={24} color={isActiveRoute("Home") ? "#1DA1F2" : "#657786"} />
+          <Text style={isActiveRoute("Home") ? styles.navTextActive : styles.navText}>Notificaciones</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/Profile")} style={styles.navItem}>
-          <Ionicons name="person-outline" size={24} color="#657786" />
-          <Text style={styles.navText}>Perfil</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Profile")} style={styles.navItem}>
+          <Ionicons name="person-outline" size={24} color={isActiveRoute("Home") ? "#1DA1F2" : "#657786"} />
+          <Text style={isActiveRoute("Home") ? styles.navTextActive : styles.navText}>Perfil</Text>
         </TouchableOpacity>
       </View>
   )

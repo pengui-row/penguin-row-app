@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     const posts = [
         {
         id: "1",
-        avatar: require("../assets/images/avatars/avatar1.png"),
+        avatar: require("../../assets/images/avatars/avatar1.png"),
         name: "Martha Craig",
         handle: "@craig_love",
         time: "12h",
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         },
         {
         id: "2",
-        avatar: require("../assets/images/avatars/avatar3.jpg"),
+        avatar: require("../../assets/images/avatars/avatar3.jpg"),
         name: "CrownList LLC",
         handle: "@crownlistllc",
         time: "1 mar.",
@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
           <PostCard key={post.id} post={post} />
         ))}
       </ScrollView>
-      <NavTabs/>
     </SafeAreaView>
   )
 };

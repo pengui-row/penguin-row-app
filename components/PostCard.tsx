@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { router } from "expo-router";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
@@ -58,6 +59,10 @@ const PostCard = ({ post }: PostProps) => {
   const handlePressFavorite = () => {
     setFavorite(!favorite)
   }
+
+  const handlePressComment = () => {
+    router.navigate('/(post)')
+  }
   return (
     <View style={styles.postContainer}>
       <Image source={post.avatar} style={styles.avatar} />
@@ -89,7 +94,7 @@ const PostCard = ({ post }: PostProps) => {
             <Text style={{...styles.actionText, color: isLiked ? "red" : "#657786"}}>{likes}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity onPress={handlePressComment} style={styles.actionButton}>
             <Feather name="message-circle" size={16} color="#657786" />
             <Text style={styles.actionText}>{post.comments}</Text>
           </TouchableOpacity>

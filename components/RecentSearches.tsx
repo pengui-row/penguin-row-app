@@ -1,14 +1,14 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { Feather } from '@expo/vector-icons';
 
 interface RecentSearchesProps {
   searches: string[];
   onRemoveSearch: (index: number) => void;
+  onSearchPress: (searchText: string) => void; 
 }
 
-const RecentSearches: React.FC<RecentSearchesProps> = ({ searches, onRemoveSearch }) => {
+const RecentSearches: React.FC<RecentSearchesProps> = ({ searches, onRemoveSearch, onSearchPress }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>BÚSQUEDAS RECIENTES</Text>
@@ -17,7 +17,8 @@ const RecentSearches: React.FC<RecentSearchesProps> = ({ searches, onRemoveSearc
           <SearchItem 
             key={index} 
             text={search} 
-            onRemove={() => onRemoveSearch(index)} 
+            onRemove={() => onRemoveSearch(index)}
+            onTextPress={onSearchPress} 
           />
         ))}
       </View>
@@ -28,12 +29,15 @@ const RecentSearches: React.FC<RecentSearchesProps> = ({ searches, onRemoveSearc
 interface SearchItemProps {
   text: string;
   onRemove: () => void;
+  onTextPress: (searchText: string) => void; 
 }
 
-const SearchItem: React.FC<SearchItemProps> = ({ text, onRemove }) => {
+const SearchItem: React.FC<SearchItemProps> = ({ text, onRemove, onTextPress }) => {
   return (
     <View style={styles.searchItem}>
-      <Text style={styles.searchText}>{text}</Text>
+      <TouchableOpacity onPress={() => onTextPress(text)}>
+        <Text style={styles.searchText}>{text}</Text>
+      </TouchableOpacity>
       <TouchableOpacity onPress={onRemove} style={styles.removeButton}>
         <AntDesign name="closecircleo" size={18} color="#888" />
       </TouchableOpacity>

@@ -35,7 +35,7 @@ export const PostDetail: FC = () => {
     const [isLiked, setIsLiked] = useState<boolean>(
         post.isLiked ? true : false
     );
-
+    const [coment, setComent] = useState("");
     const comments = [
         {
             id: "1",
@@ -90,7 +90,7 @@ export const PostDetail: FC = () => {
     return (
         <SafeAreaView style={styles.container}>
             {/* Header */}
-            <Header title='Perfil' onBack={() => { router.back() }} />
+            <Header title='' onBack={() => { router.back() }} />
 
             {/* Post */}
             <View style={styles.viewBody}>
@@ -142,7 +142,7 @@ export const PostDetail: FC = () => {
                     </View>
                     <View style={styles.commentInputContainer}>
                         <Image source={require(`${avatarPath}avatar2.png`)} style={styles.avatar} />
-                        <Input inputStyle={styles.commentInput} style={{ width: '84%' }} placeholder='Postea tu respuesta' onChangeText={() => { }} value='' />
+                        <Input inputStyle={styles.commentInput} style={{ width: '84%' }} placeholder='Postea tu respuesta' onChangeText={setComent} value={coment} />
                     </View>
 
                     <Button style={styles.sendButton} title='Responder' onPress={() => { }} />

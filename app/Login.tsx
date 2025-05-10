@@ -11,8 +11,7 @@ import Logo from "@/components/Logo";
 import Toast from "@/components/Toast";
 import { useAuth } from "./context/AuthContext";
 
-const API_URL = 'http://192.168.0.103:3000/api';
-const API_SECRET = 'bio-stats-tech-test-api-secret';
+import {API_URL, API_SECRET} from "@env";
 
 const Login: React.FC = () => {
   const { setToken } = useAuth();

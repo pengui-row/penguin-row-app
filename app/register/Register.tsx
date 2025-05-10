@@ -10,9 +10,7 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import Toast from '@/components/Toast'
 import { Validation } from '@/utils/validate'
 import { useAuth } from '../context/AuthContext'
-
-const API_URL = 'http://192.168.0.103:3000/api';
-const API_SECRET = 'bio-stats-tech-test-api-secret';
+import {API_URL, API_SECRET} from "@env";
 
 const Register = () => {
     const { setToken } = useAuth();

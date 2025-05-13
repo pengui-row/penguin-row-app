@@ -8,12 +8,30 @@ import { HashtagSelector } from "../../components/Hashtag-selector"
 
 import { ImageAttachment } from "../../components/Image-attachment"
 import { router } from "expo-router"
+import { useAuth } from "../context/AuthContext"
+import Toast from "@/components/Toast"
 const CreatePost: React.FC = () => {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [selectedHashtag, setSelectedHashtag] = useState("#Privado")
   const [images, setImages] = useState<string[]>([])
-
+  const { token } = useAuth();
+  const [toast, setToast] = useState(false);
+    const [toastConfig, setToastConfig] = useState<{
+      title: string;
+      message: string;
+      type: "success" | "failure";
+    }>({
+      title: '',
+      message: '',
+      type: 'success'
+    });
+  
+  const showToast = (title: string, message: string, type: 'success' | 'failure' = 'success') => {
+    setToastConfig({ title, message, type });
+    setToast(true);
+    setTimeout(() => setToast(false), 5000);
+  };
   const handleBack = () => {
     router.back()
   }
@@ -38,7 +56,7 @@ const CreatePost: React.FC = () => {
     }
   }
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     console.log({
       title,
       content,
@@ -46,6 +64,28 @@ const CreatePost: React.FC = () => {
       images,
     })
     console.log("funcion de publicar")
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/post/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'api-secret': process.env.EXPO_PUBLIC_API_SECRET,
+          'Authorization': `Bearer ${token}`
+        } as HeadersInit,
+        body: JSON.stringify({
+          content: content,
+          image_url:images[0],
+          tags: [selectedHashtag]
+        })
+      });
+      if (!response.ok) {
+        throw new Error('Error al crear post');
+      }
+
+      showToast("Post creado", "Creado post con exito", "success")
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
@@ -79,6 +119,14 @@ const CreatePost: React.FC = () => {
       <TouchableOpacity style={styles.publishButton} onPress={handlePublish} activeOpacity={0.8}>
         <Text style={styles.publishButtonText}>PUBLICAR</Text>
       </TouchableOpacity>
+      <Toast
+        visible={toast}
+        title={toastConfig.title}
+        message={toastConfig.message}
+        type={toastConfig.type}
+        onClose={() => setToast(false)}
+        autoCloseDelay={5000}
+      />
     </View>
   )
 }

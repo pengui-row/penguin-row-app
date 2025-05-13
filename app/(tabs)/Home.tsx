@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View, Image, ScrollView } from "react-native"
 import PostCard from "@/components/PostCard";
 import Logo from "@/components/Logo";
+import { useAuth } from '../context/AuthContext';
 
 // Declaramos el tipo para las props (aunque no tiene props por ahora).
 interface HomeProps {}
+
+interface UserPost {
+  id: string;
+  avatar: any;
+  name: string;
+  handle: string;
+  time: string;
+  content: string;
+  comments: string;
+  repost: string;
+  likes: string;
+  hasImage: boolean;
+}
 
 const Home: React.FC<HomeProps> = () => {
 
@@ -37,7 +51,7 @@ const styles = StyleSheet.create({
   
     //   lista de posts a mostrar en el feed
     const avatarPath = '@/assets/images/avatars/';
-    const posts = [
+    const default_posts = [
         {
         id: "1",
         avatar: require("../../assets/images/avatars/avatar1.png"),
@@ -64,8 +78,31 @@ const styles = StyleSheet.create({
         likes: "0",
         hasImage: false,
         },
-    ]
+    ];
+    const { token } = useAuth();
+    const [posts, setPost] = useState<UserPost[]>([]);
 
+    const getPosts = async () => {
+      try {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/post/get`, {
+          method: 'GET',
+          headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'api-secret': process.env.EXPO_PUBLIC_API_SECRET,
+          'Authorization': `Bearer ${token}`
+        } as HeadersInit,
+        }
+        );
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    useEffect(()=>{
+      getPosts()
+    },[])
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>

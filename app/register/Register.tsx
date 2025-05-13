@@ -10,7 +10,6 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import Toast from '@/components/Toast'
 import { Validation } from '@/utils/validate'
 import { useAuth } from '../context/AuthContext'
-import {API_URL, API_SECRET} from "@env";
 
 const Register = () => {
     const { setToken } = useAuth();
@@ -75,11 +74,11 @@ const Register = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`${API_URL}/auth/register`, {
+            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'api-secret': API_SECRET
+                    'api-secret': process.env.EXPO_PUBLIC_API_SECRET
                 } as HeadersInit,
                 body: JSON.stringify({
                     name: name.split('',2)[0],

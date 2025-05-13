@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { router } from "expo-router";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import Avatar from './Avatar';
 
 interface PostProps {
   post: {
     id: string;
-    avatar: any;
+    image?: any;
     name: string;
     handle: string;
     time: string;
@@ -48,7 +49,7 @@ const PostCard = ({ post }: PostProps) => {
   }
   return (
     <View style={styles.postContainer}>
-      <Image source={post.avatar} style={styles.avatar} />
+      <Avatar name={post.name}/>
 
       <View style={styles.postContent}>
         <View style={styles.postHeader}>
@@ -74,10 +75,7 @@ const PostCard = ({ post }: PostProps) => {
 
         {post.hasImage && (
           <View style={styles.imageContainer}>
-            {/* Simulación de imagen genérica */}
-            <View style={styles.imgPost}>
-              <Feather name="image" size={48} color="#B6DBFD" />
-            </View>
+            <Image src={post.image} style={styles.imgPost}/>
           </View>
         )}
 

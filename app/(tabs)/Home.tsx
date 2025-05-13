@@ -10,7 +10,7 @@ interface HomeProps {}
 
 interface UserPost {
   id: string;
-  avatar: any;
+  image?: any;
   name: string;
   handle: string;
   time: string;
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
           const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags } = post;
           responsePost.push({
             id: id,
-            avatar: null,
+            image: image_url,
             name: `${user.name} ${user.lastName}`,
             handle: `@${user.name}${user.lastName}`,
             time: parser.timeFromTimeStamp(time_stamp),
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
             comments: commentsCount,
             repost: "0",
             likes: likesCount?.toString() || "0",
-            hasImage: false,
+            hasImage: image_url ? true : false,
             tags: tags
           })
           

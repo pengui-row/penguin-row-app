@@ -16,6 +16,7 @@ interface PostProps {
     hasImage: boolean;
     favorite?: boolean;
     isLiked?: boolean;
+    tags?: string[];
   };
 }
 
@@ -27,25 +28,7 @@ const PostCard = ({ post }: PostProps) => {
   const [isLiked, setIsLiked] = useState<boolean>(
     post.isLiked ? true : false
   );
-  // Función para resaltar hashtags
-  const renderTextWithHashtags = (text: string) => {
-    const parts = text.split(/(#\w+)/g); // Dividir el texto en partes
-    return parts.map((part, index) => {
-      if (part.startsWith("#")) {
-        return (
-          <Text key={index} style={styles.hashtag}>
-            {part}
-          </Text>
-        );
-      } else {
-        return (
-          <Text key={index} style={styles.postText}>
-            {part}
-          </Text>
-        );
-      }
-    });
-  };
+  
   const handlePressLike = () => {
     if (isLiked){
       setLikes(`${parseInt(likes) - 1}`);
@@ -76,7 +59,17 @@ const PostCard = ({ post }: PostProps) => {
 
         {/* Mostrar el texto con hashtags resaltados */}
         <View style={styles.postTextContainer}>
-          {renderTextWithHashtags(post.content)}
+          <Text style={styles.postText}>
+            {post.content}
+          </Text>
+          {
+            post.tags && 
+            post.tags.map((tag, index) => (
+              <Text key={index} style={styles.hashtag}>
+                {" " + tag}
+              </Text>
+            ))
+          }
         </View>
 
         {post.hasImage && (

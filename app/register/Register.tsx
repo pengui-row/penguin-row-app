@@ -9,8 +9,11 @@ import Input from '@/components/Input'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import Toast from '@/components/Toast'
 import { Validation } from '@/utils/validate'
+import { useAuth } from '../context/AuthContext'
+import {API_URL, API_SECRET} from "@env";
 
 const Register = () => {
+    const { setToken } = useAuth();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [birthdate, setBirthdate] = useState<Date>(new Date());
@@ -18,14 +21,17 @@ const Register = () => {
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [confirm, setConfirm] = useState("");
+    const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState(false);
     const [titleToast, setTitleToast] = useState("");
     const [message, setMessage] = useState("");
     const [type, setType] = useState<"failure" | "success">("failure");
     const validate = new Validation();
+
     const togglePicker = () => {
         setShowPicker(!showPicker);
     };
+
     const onChangePicker = (event:DateTimePickerEvent, selectedDate?:Date) => {
         if (event.type == "set") {
             const currentDate = selectedDate || new Date();
@@ -38,109 +44,156 @@ const Register = () => {
             togglePicker();
         }
     };
+
     const showToast = (title:string, message:string, type:"failure" | "success") => {
         setTitleToast(title);
         setMessage(message);
         setType(type);
         setToast(true);
     }
-    const sendRegister = () => {
+
+    const sendRegister = async () => {
         if (!name || !email || !birthdate || !phone || !password || !confirm) {
             showToast("Rellene todos los campos", "Faltan campos por rellenar", "failure");
+            return;
         }
-        else if (password != confirm) {
+
+        if (password !== confirm) {
             showToast("La contraseña y la confirmación no son iguales", "Los dos campos deben ser iguales", "failure");
+            return;
         }
-        else if (!validate.validEmail(email)) {
+
+        if (!validate.validEmail(email)) {
             showToast("Correo invalido", "Coloque un correo valido", "failure");
+            return;
         }
-        else if (!validate.validPhone(phone)) {
+
+        if (!validate.validPhone(phone)) {
             showToast("Teléfono invalido", "El numero de teléfono solo contiene 10 digitos", "failure");
+            return;
         }
-        else {
-            router.push("/register/RegisterInfo");
+
+        setLoading(true);
+        try {
+            const response = await fetch(`${API_URL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'api-secret': API_SECRET
+                } as HeadersInit,
+                body: JSON.stringify({
+                    name: name.split('',2)[0],
+                    lastName: name.split('',2)[1],
+                    email,
+                    password,
+                    birthDate: birthdate.toISOString(),
+                    phone
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Error en el registro');
+            }
+
+            // Si el registro es exitoso, iniciamos sesión automáticamente
+            setToken(data.token);
+            showToast("Registro exitoso", "¡Bienvenido!", "success");
+            router.push("/(tabs)");
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "Error al registrar usuario";
+            showToast("Error", errorMessage, "failure");
+            console.log(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
-  return (
-    <KeyboardAvoidingView 
-    behavior={Platform.OS === "ios" ? "padding" : "height"}
-    style={styles.container}
-    >
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <Card>
-            <FontAwesome.Button
-            name='arrow-left'
-            backgroundColor={"transparent"}
-            onPress={()=>{router.push("/")}}
-            color={"black"}
-            />
-                <Title content={"Registrarse"}/>
-                <View style={styles.loginContainer}>
-                    <Text style={styles.loginText}>¿Tienes una cuenta? </Text>
-                    <Button
-                    onPress={()=>{router.push("/")}}
-                    title="Inicia Sesión"
-                    style={styles.loginButton}
-                    textStyle={styles.loginLink}
+
+    return (
+        <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+        >
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <Card>
+                <FontAwesome.Button
+                name='arrow-left'
+                backgroundColor={"transparent"}
+                onPress={()=>{router.push("/")}}
+                color={"black"}
+                />
+                    <Title content={"Registrarse"}/>
+                    <View style={styles.loginContainer}>
+                        <Text style={styles.loginText}>¿Tienes una cuenta? </Text>
+                        <Button
+                        onPress={()=>{router.push("/")}}
+                        title="Inicia Sesión"
+                        style={styles.loginButton}
+                        textStyle={styles.loginLink}
+                        />
+                    </View>
+                    <Input
+                    label='Nombre Completo'
+                    value={name}
+                    onChangeText={setName}
                     />
-                </View>
-                <Input
-                label='Nombre Completo'
-                value={name}
-                onChangeText={setName}
-                />
-                <Input
-                label='Correo'
-                value={email}
-                onChangeText={setEmail}
-                keyboardType='email-address'
-                />
-                {showPicker && <DateTimePicker
-                mode='date'
-                display='spinner'
-                value={birthdate}
-                onChange={onChangePicker}
-                />}
-                <Pressable onPress={togglePicker}>
-                    <Text style={styles.label}>Fecha de Nacimiento</Text>
-                    <TextInput
-                    editable={false}
-                    value={birthdate.toLocaleDateString()}
-                    style={styles.input}
-                    onPressIn={togglePicker}
+                    <Input
+                    label='Correo'
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType='email-address'
                     />
-                </Pressable>
-                <Input
-                label='Teléfono'
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType='phone-pad'
+                    {showPicker && <DateTimePicker
+                    mode='date'
+                    display='spinner'
+                    value={birthdate}
+                    onChange={onChangePicker}
+                    />}
+                    <Pressable onPress={togglePicker}>
+                        <Text style={styles.label}>Fecha de Nacimiento</Text>
+                        <TextInput
+                        editable={false}
+                        value={birthdate.toLocaleDateString()}
+                        style={styles.input}
+                        onPressIn={togglePicker}
+                        />
+                    </Pressable>
+                    <Input
+                    label='Teléfono'
+                    value={phone}
+                    onChangeText={setPhone}
+                    keyboardType='phone-pad'
+                    />
+                    <Input
+                    label='Crear contraseña'
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    />
+                    <Input
+                    label='Confirmar contraseña'
+                    value={confirm}
+                    onChangeText={setConfirm}
+                    secureTextEntry
+                    />
+                    <Button 
+                        title={loading ? 'Registrando...' : 'Registrar'} 
+                        onPress={sendRegister}
+                        disabled={loading}
+                    />
+                </Card>
+                <Toast
+                visible={toast}
+                title={titleToast}
+                message={message}
+                type={type}
+                onClose={()=>{setToast(false)}}
+                autoCloseDelay={5000}
                 />
-                <Input
-                label='Crear contraseña'
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                />
-                <Input
-                label='Confirmar contraseña'
-                value={confirm}
-                onChangeText={setConfirm}
-                secureTextEntry
-                />
-                <Button title='Registrar' onPress={sendRegister}/>
-            </Card>
-            <Toast
-            visible={toast}
-            title={titleToast}
-            message={message}
-            type={type}
-            onClose={()=>{setToast(false)}}
-            autoCloseDelay={5000}
-            />
-        </ScrollView>
-    </KeyboardAvoidingView>
-  )
+            </ScrollView>
+        </KeyboardAvoidingView>
+    )
 }
 
 export default Register

@@ -9,8 +9,12 @@ import Title from "@/components/Title";
 import Card from "@/components/Card";
 import Logo from "@/components/Logo";
 import Toast from "@/components/Toast";
+import { useAuth } from "./context/AuthContext";
+
+import {API_URL, API_SECRET} from "@env";
 
 const Login: React.FC = () => {
+  const { setToken } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,7 +34,7 @@ const Login: React.FC = () => {
   // Función para validar formato de correo
   const isValidEmail = (email: string) => {
     const emailRegex =
-      /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/; // Regex para validar el email
+      /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     return emailRegex.test(email);
   };
 
@@ -40,7 +44,7 @@ const Login: React.FC = () => {
     setTimeout(() => setToast(false), 5000);
   };
 
-  const signInWithEmail = () => {
+  const signInWithEmail = async () => {
     if (!email || !password) {
       showToast("Datos incorrectos", "Por favor llena todos los campos.", 'failure');
       return;
@@ -51,13 +55,36 @@ const Login: React.FC = () => {
       return;
     }
 
-    // Proceder con la autenticación si los campos son válidos
     setLoading(true);
-    showToast("Inicio exitoso", "Redirigiendo...", 'success');
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'api-secret': API_SECRET
+        } as HeadersInit,
+        body: JSON.stringify({
+          email,
+          password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error en la autenticación');
+      }
+
+      // Guardar el token en el contexto
+      setToken(data.token);
+      showToast("Inicio exitoso", "Bienvenido!", 'success');
       router.push("/(tabs)");
-    }, 1000);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Error al iniciar sesión";
+      showToast("Error", errorMessage, 'failure');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signUpWithEmail = () => {
@@ -67,6 +94,7 @@ const Login: React.FC = () => {
   const recoverPassword = () => {
     router.push('/recover/RecoverPassword');
   }
+
   return (
     <Card>
       <Logo displayText={true} />

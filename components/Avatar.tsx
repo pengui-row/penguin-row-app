@@ -7,6 +7,19 @@ interface AvatarProps {
   backgroundColor?: string;
   textColor?: string;
 }
+const colorPalette = [
+  '#E57373',
+  '#FFB74D',
+  '#FFEE58',
+  '#81C784',
+  '#4FC3F7',
+  '#64B5F6',
+  '#9575CD',
+  '#F06292',
+  '#4DB6AC',
+  '#A1887F',
+];
+
 
 const generateColor = (name: string): string => {
   if (!name) {
@@ -18,18 +31,8 @@ const generateColor = (name: string): string => {
     return '#999';
   }
 
-  // Algoritmo para generar un color basado en el hash de las iniciales
-  let hash = 0;
-  for (let i = 0; i < initials.length; i++) {
-    hash = initials.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  let color = '#';
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xFF;
-    color += ('00' + value.toString(16)).substr(-2);
-  }
-  return color;
+  const index = initials.charCodeAt(0) % colorPalette.length;
+  return colorPalette[index];
 };
 
 const Avatar: React.FC<AvatarProps> = ({ name, size = 40, backgroundColor, textColor = 'white' }) => {
@@ -64,6 +67,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
+    margin: 5,
   },
   text: {
     fontWeight: 'bold',

@@ -10,10 +10,10 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import Toast from '@/components/Toast'
 import { Validation } from '@/utils/validate'
 import { useAuth } from '../context/AuthContext'
-import {API_URL, API_SECRET} from "@env";
 
 const Register = () => {
     const { setToken } = useAuth();
+    const { setUserId } = useAuth();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [birthdate, setBirthdate] = useState<Date>(new Date());
@@ -73,17 +73,20 @@ const Register = () => {
             return;
         }
 
+        const urlapi = process.env.EXPO_PUBLIC_API_URL;
+        const url = `${urlapi}/api/auth/register`;
+
         setLoading(true);
         try {
-            const response = await fetch(`${API_URL}/auth/register`, {
+            const response = await fetch(`${url}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'api-secret': API_SECRET
+                    'api-secret': process.env.EXPO_PUBLIC_API_SECRET
                 } as HeadersInit,
                 body: JSON.stringify({
-                    name: name.split('',2)[0],
-                    lastName: name.split('',2)[1],
+                    name: name.split(' ',2)[0],
+                    lastName: name.split(' ',2)[1],
                     email,
                     password,
                     birthDate: birthdate.toISOString(),
@@ -99,8 +102,8 @@ const Register = () => {
 
             // Si el registro es exitoso, iniciamos sesión automáticamente
             setToken(data.token);
-            showToast("Registro exitoso", "¡Bienvenido!", "success");
-            router.push("/(tabs)");
+            setUserId(data.id);
+            router.push("/register/RegisterInfo");
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "Error al registrar usuario";
             showToast("Error", errorMessage, "failure");

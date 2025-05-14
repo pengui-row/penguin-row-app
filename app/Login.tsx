@@ -11,7 +11,6 @@ import Logo from "@/components/Logo";
 import Toast from "@/components/Toast";
 import { useAuth } from "./context/AuthContext";
 
-import {API_URL, API_SECRET} from "@env";
 
 const Login: React.FC = () => {
   const { setToken } = useAuth();
@@ -57,18 +56,18 @@ const Login: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
-          'api-secret': API_SECRET
+          'api-secret': process.env.EXPO_PUBLIC_API_SECRET
         } as HeadersInit,
         body: JSON.stringify({
           email,
           password
         })
       });
-
       const data = await response.json();
 
       if (!response.ok) {
@@ -80,6 +79,7 @@ const Login: React.FC = () => {
       showToast("Inicio exitoso", "Bienvenido!", 'success');
       router.push("/(tabs)");
     } catch (error: unknown) {
+      console.log(error);
       const errorMessage = error instanceof Error ? error.message : "Error al iniciar sesión";
       showToast("Error", errorMessage, 'failure');
     } finally {

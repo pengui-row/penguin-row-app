@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { router } from "expo-router";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import Avatar from './Avatar';
 
 interface PostProps {
   post: {
     id: string;
-    avatar: any;
+    image?: any;
     name: string;
     handle: string;
     time: string;
@@ -16,6 +17,7 @@ interface PostProps {
     hasImage: boolean;
     favorite?: boolean;
     isLiked?: boolean;
+    tags?: string[];
   };
 }
 
@@ -27,25 +29,7 @@ const PostCard = ({ post }: PostProps) => {
   const [isLiked, setIsLiked] = useState<boolean>(
     post.isLiked ? true : false
   );
-  // Función para resaltar hashtags
-  const renderTextWithHashtags = (text: string) => {
-    const parts = text.split(/(#\w+)/g); // Dividir el texto en partes
-    return parts.map((part, index) => {
-      if (part.startsWith("#")) {
-        return (
-          <Text key={index} style={styles.hashtag}>
-            {part}
-          </Text>
-        );
-      } else {
-        return (
-          <Text key={index} style={styles.postText}>
-            {part}
-          </Text>
-        );
-      }
-    });
-  };
+  
   const handlePressLike = () => {
     if (isLiked){
       setLikes(`${parseInt(likes) - 1}`);
@@ -65,7 +49,7 @@ const PostCard = ({ post }: PostProps) => {
   }
   return (
     <View style={styles.postContainer}>
-      <Image source={post.avatar} style={styles.avatar} />
+      <Avatar name={post.name}/>
 
       <View style={styles.postContent}>
         <View style={styles.postHeader}>
@@ -76,15 +60,22 @@ const PostCard = ({ post }: PostProps) => {
 
         {/* Mostrar el texto con hashtags resaltados */}
         <View style={styles.postTextContainer}>
-          {renderTextWithHashtags(post.content)}
+          <Text style={styles.postText}>
+            {post.content}
+          </Text>
+          {
+            post.tags && 
+            post.tags.map((tag, index) => (
+              <Text key={index} style={styles.hashtag}>
+                {" " + tag}
+              </Text>
+            ))
+          }
         </View>
 
         {post.hasImage && (
           <View style={styles.imageContainer}>
-            {/* Simulación de imagen genérica */}
-            <View style={styles.imgPost}>
-              <Feather name="image" size={48} color="#B6DBFD" />
-            </View>
+            <Image src={post.image} style={styles.imgPost}/>
           </View>
         )}
 

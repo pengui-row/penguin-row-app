@@ -57,13 +57,7 @@ const CreatePost: React.FC = () => {
   }
 
   const handlePublish = async () => {
-    console.log({
-      title,
-      content,
-      hashtag: selectedHashtag,
-      images,
-    })
-    console.log("funcion de publicar")
+    const body = images.length > 0 ? { content: content,image_url:images[0], tags: [selectedHashtag] } : { content: content, tags: [selectedHashtag] }
     try {
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/post/create`, {
         method: 'POST',
@@ -72,16 +66,18 @@ const CreatePost: React.FC = () => {
           'api-secret': process.env.EXPO_PUBLIC_API_SECRET,
           'Authorization': `Bearer ${token}`
         } as HeadersInit,
-        body: JSON.stringify({
-          content: content,
-          image_url:images[0],
-          tags: [selectedHashtag]
-        })
+        body: JSON.stringify(
+          body
+        )
       });
       if (!response.ok) {
+        console.log(response)
         throw new Error('Error al crear post');
       }
-
+      setContent("");
+      setImages([]);
+      setSelectedHashtag("#Privado");
+      setTitle("");
       showToast("Post creado", "Creado post con exito", "success")
     } catch (error) {
       console.log(error)

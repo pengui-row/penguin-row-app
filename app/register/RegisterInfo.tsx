@@ -114,7 +114,7 @@ const RegisterInfo = () => {
           },
           body: JSON.stringify({
             interests: selectedPreferences,
-            professionalTitle,
+            professional_title: professionalTitle,
             location,
             talents,
             experience,

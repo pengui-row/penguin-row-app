@@ -1,37 +1,94 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useAuth } from '@/app/context/AuthContext';
 
+interface UserInfo {
+  id: string;
+  interests: string[];
+  location: string;
+  professional_title: string;
+  talents: string;
+  experience: string;
+  user: { id: string };
+}
+interface WhoAmI {
+  id: string;
+  profile: {
+    id: string;
+    email: string;
+    phone: string;
+    name: string;
+    lastName: string;
+    birthDate: string;
+  };
+}
 const ProfileDescription = () => {
-    const interest = [
-        "Entretenimiento",
-        "Música",
-        "Software"
-    ];
-    const professionalInfo = {
-        title: "Desarrollador Web Full Stack",
-        location: "Venezuela, Barquisimeto",
-        abilities: "Comunicación, Trabajo en equipo, Manejo de datos",
-        experience: "1 año Desarrollador Web Banco Provincial",
-        phone_number: "+584247260592"
+    const [userInfo, setUserInfo] = useState<UserInfo>();
+    const [userPhone, setUserPhone] = useState<WhoAmI>()
+    const { token } = useAuth();
+    
+    const getUserInfo = async () => {
+      try {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/user/user-info`, {
+          method: 'GET',
+          headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'api-secret': process.env.EXPO_PUBLIC_API_SECRET,
+          'Authorization': `Bearer ${token}`
+        } as HeadersInit,
+        }
+        );
+      
+        const dataResponded: UserInfo = await response.json();
+        if (!response.ok) {
+        throw new Error('Error al cargar la información del usuario');
+        }
+
+        setUserInfo(dataResponded);
+
+        const response2 = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/user/whoami`, {
+          method: 'GET',
+          headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'api-secret': process.env.EXPO_PUBLIC_API_SECRET,
+          'Authorization': `Bearer ${token}`
+        } as HeadersInit,
+        }
+        );
+
+        if (!response2.ok) {
+        throw new Error('Error al cargar la información del usuario');
+        }
+
+        const dataResponded2: WhoAmI = await response2.json();
+
+        setUserPhone(dataResponded2);
+      } catch (error) {
+        console.log(error)
+      }
     }
+
+    useEffect(() => {
+      getUserInfo()
+    },[]);
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.textBold}>Intereses</Text>
       <View style={styles.rowContainer}>
       {
-        interest.map((index) => (
+        userInfo?.interests.map((index) => (
             <View key={index} style={styles.tagContainer}>
               <Text style={{color:"#0D2538"}}>{index}</Text>
             </View>
         ))
       }
-      <Text style={styles.textBold}>Información Profesional</Text>
-      <Text style={styles.text}>{`•Título Profesional: ${professionalInfo.title}`}</Text>
-      <Text style={styles.text}>{`•Ubicación: ${professionalInfo.location}`}</Text>
-      <Text style={styles.text}>{`•Habilidades: ${professionalInfo.abilities}`}</Text>
-      <Text style={styles.text}>{`•Experiencia Laboral: ${professionalInfo.experience}`}</Text>
-      <Text style={styles.text}>{`•Telefono: ${professionalInfo.phone_number}`}</Text>
       </View>
+      <Text style={styles.textBold}>Información Profesional</Text>
+      <Text style={styles.text}>{`•Título Profesional: ${userInfo?.professional_title}`}</Text>
+      <Text style={styles.text}>{`•Ubicación: ${userInfo?.location}`}</Text>
+      <Text style={styles.text}>{`•Habilidades: ${userInfo?.talents}`}</Text>
+      <Text style={styles.text}>{`•Experiencia Laboral: ${userInfo?.experience}`}</Text>
+      <Text style={styles.text}>{`•Telefono: ${userPhone?.profile.phone}`}</Text>
     </ScrollView>
   )
 }

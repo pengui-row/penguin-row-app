@@ -20,6 +20,8 @@ interface UserPost {
   likes: string;
   hasImage: boolean;
   tags?: string[];
+  favorite?: boolean;
+  isLiked?: boolean;
 }
 
 interface ApiResponse {
@@ -96,7 +98,7 @@ const styles = StyleSheet.create({
         setCurrentPage(responseCurrentPage + 1);
         const responsePost: UserPost[] = [];
         data.forEach((post: any) => {
-          const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags } = post;
+          const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags, isLiked, isFavorite } = post;
           responsePost.push({
             id: id,
             image: image_url,
@@ -108,7 +110,9 @@ const styles = StyleSheet.create({
             repost: "0",
             likes: likesCount?.toString() || "0",
             hasImage: image_url ? true : false,
-            tags: tags
+            tags: tags,
+            favorite: isFavorite,
+            isLiked: isLiked
           })
           
         })

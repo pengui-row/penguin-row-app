@@ -12,6 +12,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import Avatar from "./Avatar";
 import { useAuth } from "@/app/context/AuthContext"; // Importar useAuth
+import { Parser } from "@/utils/parser";
 
 interface PostProps {
   post: {
@@ -32,8 +33,9 @@ interface PostProps {
 
 interface Comment {
   id: string;
-  text: string;
-  author: string; // Podrías expandir esto a un objeto User si el backend devuelve más info
+  content: string;
+  user: {name: string, lastName:string};
+  createdAt: Date;
 }
 
 const PostCard = ({ post }: PostProps) => {
@@ -49,7 +51,7 @@ const PostCard = ({ post }: PostProps) => {
 
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const apiSecret = process.env.EXPO_PUBLIC_API_SECRET;
-
+  const parser = new Parser();
   const handlePressLike = async () => {
     const originalIsLiked = isLiked;
     const originalLikesCount = likesCount;
@@ -275,16 +277,13 @@ const PostCard = ({ post }: PostProps) => {
               <Text>No hay comentarios aún. ¡Sé el primero!</Text>
             )}
             {!loadingComments && !errorComments && comments.length > 0 && (
-              <FlatList
-                data={comments}
-                renderItem={({ item }: { item: Comment }) => (
-                  <View style={styles.commentContainer}>
-                    <Text style={styles.commentAuthor}>{item.author}:</Text>
-                    <Text style={styles.commentText}>{item.text}</Text>
-                  </View>
-                )}
-                keyExtractor={(item) => item.id}
-              />
+              comments.map((item) => (
+                <View style={styles.commentContainer} key={item.id}>
+                    <Text style={styles.commentAuthor}>{item.user.name + " " + item.user.lastName}:</Text>
+                    <Text>{parser.timeFromTimeStamp(item.createdAt)}</Text>
+                    <Text style={styles.commentText}>{item.content}</Text>
+                </View>
+              ))
             )}
             <View style={styles.addCommentContainer}>
               <TextInput

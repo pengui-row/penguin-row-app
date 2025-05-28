@@ -17,6 +17,7 @@ interface UserPost {
   tags?: string[];
   favorite?: boolean;
   isLiked?: boolean;
+  userId?: string;
 }
 interface ApiResponse {
   data: any[];
@@ -61,7 +62,7 @@ const UserPosts = () => {
         setCurrentPage(responseCurrentPage + 1);
         const responsePost: UserPost[] = [];
         data.forEach((post: any) => {
-          const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags, isLiked, isFavorite } = post;
+          const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags, isLiked, isFavorite, userId } = post;
           responsePost.push({
             id: id,
             image: image_url,
@@ -75,7 +76,8 @@ const UserPosts = () => {
             hasImage: image_url ? true : false,
             tags: tags,
             favorite: isFavorite,
-            isLiked: isLiked
+            isLiked: isLiked,
+            userId: userId,
           })
           
         })

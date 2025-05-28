@@ -28,6 +28,7 @@ interface PostProps {
     favorite?: boolean;
     isLiked?: boolean;
     tags?: string[];
+    userId?: string;
   };
 }
 
@@ -38,6 +39,22 @@ interface Comment {
   createdAt: Date;
 }
 
+interface CommentApiResponse {
+  content: string;
+  createdAt: string;
+  id: string;
+  postId: string;
+  status: string;
+  user: { id:string };
+  userId: string;
+}
+
+interface NotificationData {
+  relatedEntityId:string;
+  description: string; 
+  userToNotifyId: string;
+  type: 'LIKE' | 'COMMENT';
+}
 const PostCard = ({ post }: PostProps) => {
   const { token } = useAuth(); // Obtener el token
   const [likesCount, setLikesCount] = useState(parseInt(post.likes, 10) || 0);
@@ -146,13 +163,13 @@ const PostCard = ({ post }: PostProps) => {
       }
 
       const responseData = await response.json();
-      const fetchedComments: Comment[] = responseData.data; // Acceder a la propiedad 'data'
-      setComments(fetchedComments);
+      const { data } = responseData;
+      const fetchedComments: Comment[] = data || []; // Acceder a la propiedad 'data'
+      if (fetchedComments) {
+        setComments(fetchedComments);
+      }
     } catch (error: any) {
       console.error("Error en fetchComments:", error);
-      setErrorComments(
-        error.message || "No se pudieron cargar los comentarios."
-      );
       setComments([]); // Opcional: limpiar comentarios en caso de error
     } finally {
       setLoadingComments(false);
@@ -189,6 +206,12 @@ const PostCard = ({ post }: PostProps) => {
           // Aquí podrías mostrar un toast de error al usuario
           return;
         }
+        const responseData = await response.json();
+        const { postId }: CommentApiResponse = responseData;
+        handleSendNotification({relatedEntityId:postId, 
+          description:`Se ha comentado la publicación de ${post.name}`, 
+          type:'COMMENT', 
+          userToNotifyId:post.userId || ""});
         setNewComment("");
         await fetchComments(); // Recargar comentarios para mostrar el nuevo
       } catch (error) {
@@ -198,6 +221,24 @@ const PostCard = ({ post }: PostProps) => {
     }
   };
 
+  const handleSendNotification = async (notifData: NotificationData) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/user/notification`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-secret": apiSecret,
+            Authorization: `Bearer ${token}`,
+          } as HeadersInit,
+          body: JSON.stringify( notifData ),
+        });
+      if (!response.ok) {
+        throw new Error("Error al crear la notificación ")
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <View style={styles.postContainer}>
       <Avatar name={post.name} />

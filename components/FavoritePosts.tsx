@@ -48,8 +48,6 @@ const FavoritePosts = () => {
       setLoading(true);
       if (targetPage === 1) {
         setError(null);
-      } else if (!refreshing) {
-        setError(null);
       }
       try {
         const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/post/favorite-post?page=${targetPage}&page_size=${pageSize}`, {
@@ -101,6 +99,7 @@ const FavoritePosts = () => {
         });
       }
         setCurrentPage(responseCurrentPage + 1);
+        setError(null);
       } catch (err: any) {
         if (typeof err === 'string') {
         setError(err);
@@ -119,21 +118,23 @@ const FavoritePosts = () => {
     }, [currentPage, loading, totalPosts, posts.length, error, loading, refreshing]);
 
     useEffect(() => {
-    if (currentPage === 1 && posts.length === 0 && !loading && !refreshing) {
+    if (currentPage === 1 && posts.length === 0 && !loading && !refreshing && !error) {
         getPosts(1);
     }
-    }, [currentPage, posts.length, loading, refreshing, getPosts]);
+    }, [currentPage, posts.length, loading, refreshing, getPosts, error]);
     const handleScrollToEnd = ({ nativeEvent }: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
       const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
       const isCloseToBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 20;
-      if (isCloseToBottom && !loading && !refreshing && (posts.length < totalPosts || totalPosts === 0) ) {
+      if (isCloseToBottom && !loading && !refreshing && !error && (posts.length < totalPosts || totalPosts === 0) ) {
         getPosts();
       }
     };
     const onRefresh = useCallback(() => {
         setRefreshing(true);
+        setCurrentPage(1);
+        setError(null);
+        setPost([]);
         getPosts(1);
-    
       }, [getPosts]);
   return (
     <ScrollView style={styles.content} onScroll={handleScrollToEnd} scrollEventThrottle={40}

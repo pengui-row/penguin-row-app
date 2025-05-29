@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Image, ScrollView } from "react-native"
+import { SafeAreaView, StyleSheet, View, Image, ScrollView, TouchableHighlight } from "react-native"
 import PostCard from "@/components/PostCard";
 import Logo from "@/components/Logo";
 import { useAuth } from '../context/AuthContext';
@@ -149,6 +149,10 @@ const styles = StyleSheet.create({
         getPosts();
       }
   };
+  const reload = () => {
+    setPost([]);
+    setCurrentPage(1);
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -156,7 +160,9 @@ const styles = StyleSheet.create({
           source={require(`${avatarPath}avatar2.png`)} //foto de perfil
           style={styles.profilePic}
         />
-        <Logo displayText={false}/>
+        <TouchableHighlight onPress={reload}>
+          <Logo displayText={false}/>
+        </TouchableHighlight>
         <View style={styles.placeholder} />
       </View>
 

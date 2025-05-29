@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@/app/context/AuthContext';
 
@@ -24,7 +24,8 @@ interface WhoAmI {
 }
 const ProfileDescription = () => {
     const [userInfo, setUserInfo] = useState<UserInfo>();
-    const [userPhone, setUserPhone] = useState<WhoAmI>()
+    const [userPhone, setUserPhone] = useState<WhoAmI>();
+    const [refreshing, setRefreshing] = useState<boolean>(false);
     const { token } = useAuth();
     
     const getUserInfo = async () => {
@@ -65,14 +66,23 @@ const ProfileDescription = () => {
         setUserPhone(dataResponded2);
       } catch (error) {
         console.log(error)
+      } finally {
+        setRefreshing(false);
       }
     }
-
+    const onRefreshing = useCallback(()=> {
+      setRefreshing(true);
+      getUserInfo()
+    },[getUserInfo])
     useEffect(() => {
       getUserInfo()
     },[]);
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container}
+    refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefreshing}/>
+    }
+    >
       <Text style={styles.textBold}>Intereses</Text>
       <View style={styles.rowContainer}>
       {

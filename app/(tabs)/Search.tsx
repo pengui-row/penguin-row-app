@@ -92,7 +92,6 @@ export default function Search() {
 
         const { data, total, currentPage: responseCurrentPage  } = dataResponded;
         setTotalPosts(total);
-        setCurrentPage(responseCurrentPage + 1);
         const responsePost: UserPost[] = [];
         data.forEach((post: any) => {
           const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags, isLiked, isFavorite, userId } = post;
@@ -119,7 +118,9 @@ export default function Search() {
           const uniqueNew = responsePost.filter((newPost) => !uniquePrev.has(newPost.id));
           return [...prev, ...uniqueNew];
         })
-        
+        const currentSearches = recentSearches;
+        currentSearches.push(searchQuery);
+        setRecentSearches(currentSearches);
       } catch (err: any) {
         if (typeof err === 'string') {
         setError(err);
@@ -132,7 +133,7 @@ export default function Search() {
       } finally {
       setLoading(false);
       }
-    }, [currentPage, loading, totalPosts, posts.length, searchQuery]);
+    }, [searchQuery]);
 
     useEffect(() => {
     getPosts();

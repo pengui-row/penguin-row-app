@@ -1,11 +1,11 @@
 import React from 'react'
-import { router, usePathname } from "expo-router";
+import { router, useNavigation, usePathname } from "expo-router";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 
-const NavTabs = () => {
+const NavTabs = ({props}:any) => {
     const pathname = usePathname();
-
+    const navigatation = useNavigation();
     const isActive = (path: string) => {
         return pathname === path;
     };
@@ -48,7 +48,7 @@ const NavTabs = () => {
 
     return (
         <View style={styles.bottomNav}>
-            <TouchableOpacity onPress={() => router.push("/Home")} style={styles.navItem}>
+            <TouchableOpacity onPress={() => router.navigate('/(tabs)/Home')} style={styles.navItem}>
                 <Ionicons 
                     name="home" 
                     size={24} 
@@ -58,7 +58,7 @@ const NavTabs = () => {
                     Principal
                 </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/Search")} style={styles.navItem}>
+            <TouchableOpacity onPress={() => router.navigate("/(tabs)/Search")} style={styles.navItem}>
                 <Ionicons 
                     name="search-outline" 
                     size={24} 
@@ -68,12 +68,12 @@ const NavTabs = () => {
                     Buscar
                 </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/CreatePost")} style={styles.navItemCenter}>
+            <TouchableOpacity onPress={() => router.navigate("/(tabs)/CreatePost")} style={styles.navItemCenter}>
                 <View style={styles.addButton}>
                     <Ionicons name="add" size={24} color="white" />
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/Notifications")} style={styles.navItem}>
+            <TouchableOpacity onPress={() => router.navigate("/(tabs)/Notifications")} style={styles.navItem}>
                 <Ionicons 
                     name="notifications-outline" 
                     size={24} 
@@ -83,7 +83,7 @@ const NavTabs = () => {
                     Notificaciones
                 </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/Profile")} style={styles.navItem}>
+            <TouchableOpacity onPress={() => router.navigate("/(tabs)/Profile")} style={styles.navItem}>
                 <Ionicons 
                     name="person-outline" 
                     size={24} 

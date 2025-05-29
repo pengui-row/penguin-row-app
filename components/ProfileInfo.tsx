@@ -1,35 +1,67 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
-
+import { useAuth } from '@/app/context/AuthContext';
+import Avatar from './Avatar';
+interface WhoAmI {
+  id: string;
+  profile: {
+    id: string;
+    email: string;
+    phone: string;
+    name: string;
+    lastName: string;
+    birthDate: string;
+  };
+}
 const ProfileInfo = () => {
-    const avatarPath = '@/assets/images/avatars/';
-    const baseInfo = {
-        name: "Lucas Scott",
-        userName: "lucasscott3",
-        post: 12,
-        followers: 520,
-        followed: 16
+    const [baseInfo, setBaseInfo] = useState<WhoAmI>();
+    const { token } = useAuth();
+
+    const getUserBaseInfo = async () => {
+        try {
+            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/user/whoami`, {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'api-secret': process.env.EXPO_PUBLIC_API_SECRET,
+            'Authorization': `Bearer ${token}`
+            } as HeadersInit,
+            }
+            );
+
+            if (!response.ok) {
+            throw new Error('Error al cargar la información del usuario');
+            }
+
+            const dataResponded: WhoAmI = await response.json();
+            setBaseInfo(dataResponded);
+            //todo obtener cantidad de post seguidores y seguidos
+        } catch (error) {
+          console.log(error)  
+        }
     }
+    useEffect(()=> {
+      getUserBaseInfo()
+    },[])
   return (
     <View style={styles.container}>
       <View>
-        <Image source={require(`${avatarPath}avatar2.png`)} style={styles.profilePic}/>
-        <MaterialIcons name='edit' color={"white"} style={styles.editIcon}/>
+        <Avatar name={baseInfo?.profile.name + " " + baseInfo?.profile.lastName} size={55}/>
       </View>
-      <Text style={{fontWeight:"bold", fontSize:20}}>{baseInfo.name}</Text>
-      <Text>{`@${baseInfo.userName}`}</Text>
+      <Text style={{fontWeight:"bold", fontSize:20}}>{baseInfo?.profile.name + " " + baseInfo?.profile.lastName}</Text>
+      <Text>{`@${baseInfo?.profile.name}${baseInfo?.profile.lastName}`}</Text>
       <View style={styles.rowContainer}>
         <View style={styles.textContainer}>
-            <Text style={styles.boldText}>{baseInfo.post}</Text>
+            <Text style={styles.boldText}>{0}</Text>
             <Text>Publicaciones</Text>
         </View>
         <View style={styles.textContainer}>
-            <Text style={styles.boldText}>{baseInfo.followers}</Text>
+            <Text style={styles.boldText}>{0}</Text>
             <Text>Seguidores</Text>
         </View>
         <View style={styles.textContainer}>
-            <Text style={styles.boldText}>{baseInfo.followed}</Text>
+            <Text style={styles.boldText}>{0}</Text>
             <Text>Seguidos</Text>
         </View>
       </View>

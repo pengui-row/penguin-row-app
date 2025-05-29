@@ -6,12 +6,26 @@ import NavTabs from '@/components/NavTabs'
 const _layout = () => {
   return (
     <Tabs
-    tabBar={props => <NavTabs navigation={props.navigation} state={props.state} descriptors={props.descriptors} insets={props.insets}/>}
+    tabBar={props => <NavTabs {...props}/>}
     screenOptions={{
         headerShown: false
       }}
     >
-        
+      <Tabs.Screen
+      name='index'
+      />
+      <Tabs.Screen
+      name='Search'
+      />
+      <Tabs.Screen
+      name='CreatePost'
+      />
+      <Tabs.Screen
+      name='Notifications'
+      />
+      <Tabs.Screen
+      name='Profile'
+      />
     </Tabs>
   )
 }

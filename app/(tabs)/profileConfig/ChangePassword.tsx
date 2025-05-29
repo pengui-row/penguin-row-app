@@ -6,6 +6,7 @@ import { router } from 'expo-router'
 import Input from '@/components/Input'
 import Button from '@/components/Button'
 import Toast from '@/components/Toast'
+import { useAuth } from '@/app/context/AuthContext'
 
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState("");
@@ -15,7 +16,8 @@ const ChangePassword = () => {
   const [toastMessage, setToastMessage] = useState("Contraseña Cambiada");
   const [toastDescription, setToastDescription] = useState("Nueva contraseña creada");
   const [toastType, setToastType] = useState<"failure" | "success">("failure");
-  const sendNewPassword = () => {
+  const { token } = useAuth();
+  const sendNewPassword = async () => {
     if (!oldPassword || !newPassword || !confirm) {
       setToastMessage("Introduzca los datos requeridos");
       setToastDescription("Faltan datos");
@@ -25,6 +27,29 @@ const ChangePassword = () => {
       setToastDescription("La nueva contraseña y su confirmación deben ser iguales");
     }
     else {
+      try {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/auth/password`,{
+          method: 'PUT',
+          headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'api-secret': process.env.EXPO_PUBLIC_API_SECRET,
+          'Authorization': `Bearer ${token}`
+          } as HeadersInit,
+          body: JSON.stringify({ old_password:oldPassword, password:newPassword })
+        }
+        );
+        if (!response.ok) {
+          setToastMessage("Error");
+          setToastDescription("Error al cambiar la contraseña");
+        }
+
+        setOldPassword("");
+        setNewPassword("");
+        setConfirm("");
+      } catch (error) {
+        setToastMessage("Error");
+        setToastDescription("Error al cambiar la contraseña");
+      }
       setToastMessage("Contraseña Cambiada");
       setToastDescription("Nueva contraseña creada");
       setToastType("success");

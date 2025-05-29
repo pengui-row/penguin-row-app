@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Image, ScrollView } from "react-native"
+import { SafeAreaView, StyleSheet, View, Image, ScrollView, TouchableHighlight } from "react-native"
 import PostCard from "@/components/PostCard";
 import Logo from "@/components/Logo";
 import { useAuth } from '../context/AuthContext';
@@ -22,6 +22,7 @@ interface UserPost {
   tags?: string[];
   favorite?: boolean;
   isLiked?: boolean;
+  userId?: string;
 }
 
 interface ApiResponse {
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
         setCurrentPage(responseCurrentPage + 1);
         const responsePost: UserPost[] = [];
         data.forEach((post: any) => {
-          const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags, isLiked, isFavorite } = post;
+          const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags, isLiked, isFavorite, userId } = post;
           responsePost.push({
             id: id,
             image: image_url,
@@ -112,7 +113,8 @@ const styles = StyleSheet.create({
             hasImage: image_url ? true : false,
             tags: tags,
             favorite: isFavorite,
-            isLiked: isLiked
+            isLiked: isLiked,
+            userId: userId
           })
           
         })
@@ -147,6 +149,10 @@ const styles = StyleSheet.create({
         getPosts();
       }
   };
+  const reload = () => {
+    setPost([]);
+    setCurrentPage(1);
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -154,7 +160,9 @@ const styles = StyleSheet.create({
           source={require(`${avatarPath}avatar2.png`)} //foto de perfil
           style={styles.profilePic}
         />
-        <Logo displayText={false}/>
+        <TouchableHighlight onPress={reload}>
+          <Logo displayText={false}/>
+        </TouchableHighlight>
         <View style={styles.placeholder} />
       </View>
 

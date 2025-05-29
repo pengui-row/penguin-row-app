@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { use } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Parser } from '@/utils/parser';
+import Avatar from './Avatar';
+import { useAuth } from '@/app/context/AuthContext';
 
 // Definición de tipos para las notificaciones
 interface Notification {
   id: string;
+  description: string;
+  time_stamp: Date;
+  status: 'READ' | 'UNREAD';
   user: {
-    name: string;
-    avatar?: string;
+    id: string;
+    profile: { name:string, lastName: string};
   };
-  action: 'like' | 'comment';
-  time: string;
-  publicationId: string;
+  type: 'LIKE' | 'COMMENT';
+  relatedEntityId: string;
 }
 
 interface NotificationsProps {
@@ -23,29 +28,55 @@ const NotificationItem: React.FC<{ notification: Notification; onPress: () => vo
   notification, 
   onPress 
 }) => {
-  const { user, action, time } = notification;
-  
-  const actionText = action === 'like' 
+  const { token } = useAuth();
+  const { user, type, time_stamp } = notification;
+  const parser = new Parser();
+  const actionText = type === 'LIKE' 
     ? 'ha dado like a tu publicación' 
     : 'ha comentado tu publicación';
 
+  const handlePress = async() => {
+    onPress();
+    if (notification.status === 'READ') {
+      return
+    }
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/user/notification`, {
+          method: 'PUT',
+          headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'api-secret': process.env.EXPO_PUBLIC_API_SECRET,
+          'Authorization': `Bearer ${token}`
+        } as HeadersInit,
+          body: JSON.stringify({ id: notification.id })
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al leer la notificación');
+        }
+
+        notification.status = 'READ';
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
-    <TouchableOpacity style={styles.notificationItem} onPress={onPress}>
+    <TouchableOpacity style={notification.status === 'UNREAD' ? styles.notificationItem : styles.readNotificationItem} onPress={handlePress}>
       <View style={styles.avatarContainer}>
-        {user.avatar ? (
-          <Image source={{ uri: user.avatar }} style={styles.avatar} />
+        {false ? (
+          <Image source={{ uri: "user.avatar" }} style={styles.avatar} />
         ) : (
-          <View style={styles.defaultAvatar}>
-            <Ionicons name="person" size={24} color="#3498db" />
-          </View>
+          <Avatar
+          name={user.profile.name + " " + user.profile.lastName}
+          />
         )}
       </View>
       
       <View style={styles.contentContainer}>
         <Text style={styles.notificationText}>
-          <Text style={styles.userName}>{user.name}</Text> {actionText}
+          <Text style={styles.userName}>{user.profile.name + " " + user.profile.lastName}</Text> {actionText}
         </Text>
-        <Text style={styles.timeText}>{time}</Text>
+        <Text style={styles.timeText}>{parser.timeFromTimeStamp(time_stamp)}</Text>
       </View>
       
       <Ionicons name="chevron-forward" size={20} color="#CCCCCC" style={styles.chevron} />
@@ -89,6 +120,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     marginVertical: 6,
     backgroundColor: '#F8F9FE',
+    borderRadius: 8,
+    borderBottomWidth: 0,
+  },
+  readNotificationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    marginHorizontal: 15,
+    marginVertical: 6,
+    backgroundColor: '#F2F3F5',
     borderRadius: 8,
     borderBottomWidth: 0,
   },

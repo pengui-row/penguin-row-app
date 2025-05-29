@@ -1,5 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PostCard from './PostCard'
 import { useAuth } from '@/app/context/AuthContext';
 import { Parser } from '@/utils/parser';
@@ -17,6 +17,7 @@ interface UserPost {
   tags?: string[];
   favorite?: boolean;
   isLiked?: boolean;
+  userId?: string;
 }
 interface ApiResponse {
   data: any[];
@@ -31,16 +32,27 @@ const UserPosts = () => {
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPosts, setTotalPosts] = useState<number>(0);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
     const pageSize = 10;
-    const parser = new Parser();
-    const getPosts = useCallback(async () => {
-      if (loading || (totalPosts > 0 && posts.length >= totalPosts) || error) {
+    const parser = useMemo(() => new Parser(), []);
+    const getPosts = useCallback(async (pageToFetch?: number) => {
+      const targetPage = pageToFetch !== undefined ? pageToFetch : currentPage;
+      if (pageToFetch === undefined) {
+        if (loading || (totalPosts > 0 && posts.length >= totalPosts) || error) {
+          if (refreshing && !loading) {
+            setRefreshing(false);
+          }
       return;
       }
+      }
       setLoading(true);
-      setError(null);
+      if (targetPage === 1) {
+        setError(null);
+      } else if (!refreshing) {
+        setError(null);
+      }
       try {
-        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/post/user-post?page=${currentPage}&page_size=${pageSize}`, {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/post/user-post?page=${targetPage}&page_size=${pageSize}`, {
           method: 'GET',
           headers: {
           'Content-Type': 'application/json; charset=utf-8',
@@ -58,33 +70,37 @@ const UserPosts = () => {
 
         const { data, total, currentPage: responseCurrentPage  } = dataResponded;
         setTotalPosts(total);
-        setCurrentPage(responseCurrentPage + 1);
         const responsePost: UserPost[] = [];
         data.forEach((post: any) => {
-          const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags, isLiked, isFavorite } = post;
-          responsePost.push({
-            id: id,
-            image: image_url,
-            name: `${user.name} ${user.lastName}`,
-            handle: `@${user.name}${user.lastName}`,
-            time: parser.timeFromTimeStamp(time_stamp),
-            content: content,
-            comments: commentsCount,
-            repost: "0",
-            likes: likesCount?.toString() || "0",
-            hasImage: image_url ? true : false,
-            tags: tags,
-            favorite: isFavorite,
-            isLiked: isLiked
-          })
+        const { commentsCount, content, id, image_url, user, time_stamp, likesCount, tags, isLiked, isFavorite, userId } = post;
+        responsePost.push({
+          id: id,
+          image: image_url,
+          name: `${user.name} ${user.lastName}`,
+          handle: `@${user.name}${user.lastName}`,
+          time: parser.timeFromTimeStamp(time_stamp),
+          content: content,
+          comments: commentsCount,
+          repost: "0",
+          likes: likesCount?.toString() || "0",
+          hasImage: image_url ? true : false,
+          tags: tags,
+          favorite: isFavorite,
+          isLiked: isLiked,
+          userId: userId,
+        })
           
         })
-        setPost((prev) => {
-          const uniquePrev = new Set(prev.map((post) => post.id));
-          const uniqueNew = responsePost.filter((newPost) => !uniquePrev.has(newPost.id));
-          return [...prev, ...uniqueNew];
-        })
-        
+        if (targetPage === 1) {
+        setPost(responsePost);
+        } else {
+        setPost((prevPosts) => {
+          const existingPostIds = new Set(prevPosts.map(p => p.id));
+          const newUniquePosts = responsePost.filter(p => !existingPostIds.has(p.id));
+          return [...prevPosts, ...newUniquePosts];
+        });
+      }
+        setCurrentPage(responseCurrentPage + 1);
       } catch (err: any) {
         if (typeof err === 'string') {
         setError(err);
@@ -96,21 +112,40 @@ const UserPosts = () => {
       console.log(err);
       } finally {
       setLoading(false);
+      if (pageToFetch === 1 || refreshing) {
+          setRefreshing(false);
       }
-    }, [currentPage, loading, totalPosts, posts.length]);
+      }
+    }, [currentPage, loading, totalPosts, posts.length, error, loading, refreshing]);
 
     useEffect(() => {
-    getPosts();
-    }, [getPosts]);
+    if (currentPage === 1 && posts.length === 0 && !loading && !refreshing) {
+        getPosts(1);
+    }
+    }, [currentPage, posts.length, loading, refreshing, getPosts]);
     const handleScrollToEnd = ({ nativeEvent }: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
       const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
       const isCloseToBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 20;
-      if (isCloseToBottom) {
+      if (isCloseToBottom && !loading && !refreshing && (posts.length < totalPosts || totalPosts === 0) ) {
         getPosts();
       }
     };
+    const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getPosts(1);
+
+  }, [getPosts]);
   return (
-    <ScrollView style={styles.content} onScroll={handleScrollToEnd} scrollEventThrottle={40}>
+    <ScrollView style={styles.content} onScroll={handleScrollToEnd} scrollEventThrottle={40}
+    refreshControl={
+    <RefreshControl
+      refreshing={refreshing} 
+      onRefresh={onRefresh} 
+      colors={['#007AFF']}
+      tintColor={'#007AFF'}
+      />
+    }
+    >
       {posts.map((post) => (
         <PostCard key={post.id} post={post} />
         ))}

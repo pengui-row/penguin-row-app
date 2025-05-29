@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     },
     header: {
       flexDirection: "row",
-      justifyContent: "space-between",
+      justifyContent: "center",
       alignItems: "center",
       paddingHorizontal: 15,
       paddingVertical: 10,
@@ -156,10 +156,7 @@ const styles = StyleSheet.create({
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Image
-          source={require(`${avatarPath}avatar2.png`)} //foto de perfil
-          style={styles.profilePic}
-        />
+        
         <TouchableHighlight onPress={reload}>
           <Logo displayText={false}/>
         </TouchableHighlight>
